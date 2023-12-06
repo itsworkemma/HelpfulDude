@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.pgvector import PGVector
 from openai import OpenAI
-import streamlit as st
+
+from flask import Flask
+app = Flask(__name__)
 
 ### get the OPENAI KEY from env file
 from dotenv import load_dotenv
@@ -11,6 +13,26 @@ import os
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
+
+@app.route("/")
+def index():
+    return """<form action="" method="get">
+                <label for="orgname">What is your organisation called?</label><br>
+                <input type="text" id="orgname" name="orgname">
+                <label for="orgpurpose">What is your organisations purpose?</label><br>
+                <input type="text" id="orgpurpose" name="orgpurpose">
+                <label for="focusarea">Tell me about the area you want to focus on:</label><br>
+                <input type="text" id="focusarea" name="focusarea">
+                <label for="problem">Tell me about the problem(s) you are trying to solve?</label><br>
+                <input type="text" id="problem" name="problem">
+                <label for="questions">Imagine the data was a person blahblah etc what questions would you ask?</label><br>
+                <input type="text" id="questions" name="questions">
+                <label for="knowledge">What knowledge would you like to gain after your meeting?</label><br>
+                <input type="text" id="knowledge" name="knowledge">
+                <label for="actions">What sort of actions would you expect to take after the meeting, based on your discussion?</label><br>
+                <input type="text" id="actions" name="actions">
+                <input type="submit" value="please and thanks">
+              </form>"""
 
 """
 ### collect user input basic mode
@@ -21,7 +43,6 @@ problem = input("Tell me about the problem(s) you are trying to solve?")
 questions = input("Imagine the data was a person blahblah etc what questions would you ask?")
 knowledge = input("What knowledge would you like to gain after your meeting?")
 actions = input("What sort of actions would you expect to take after the meeting, based on your discussion?")
-"""
 
 ### collect user input static answers
 orgname = "bert"
@@ -31,7 +52,9 @@ problem = "applications taking ages to be assessed and decided on, residents unh
 questions = "what could we change in our application process? why are they taking so long? how can we work better with residents and deal with unhappiness quickly before it becomes a big issue?"
 knowledge = "why local residents are so anti development"
 actions = "improve our planning application process, find new or better ways to engage with residents on proposed applications"
+"""
 
+###@app.route("/")
 ### assemble the prompt
 def request_action_plan(orgname, orgpurpose, focusarea, problem, questions, knowledge, actions):
     messages = [{"role": "system",
@@ -50,5 +73,9 @@ def request_action_plan(orgname, orgpurpose, focusarea, problem, questions, know
     return prompt, response.choices[0].message.content
 
 
-print(request_action_plan(orgname, orgpurpose, focusarea, problem, questions, knowledge, actions))
+###print(request_action_plan(orgname, orgpurpose, focusarea, problem, questions, knowledge, actions))
+
+#run on dev server
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=8080, debug=True)
 

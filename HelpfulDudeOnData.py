@@ -5,6 +5,8 @@ from langchain.vectorstores.pgvector import PGVector
 from openai import OpenAI
 
 from flask import Flask
+from flask import request, render_template
+
 app = Flask(__name__)
 
 ### get the OPENAI KEY from env file
@@ -14,25 +16,19 @@ load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 
-@app.route("/")
-def index():
-    return """<form action="" method="get">
-                <label for="orgname">What is your organisation called?</label><br>
-                <input type="text" id="orgname" name="orgname">
-                <label for="orgpurpose">What is your organisations purpose?</label><br>
-                <input type="text" id="orgpurpose" name="orgpurpose">
-                <label for="focusarea">Tell me about the area you want to focus on:</label><br>
-                <input type="text" id="focusarea" name="focusarea">
-                <label for="problem">Tell me about the problem(s) you are trying to solve?</label><br>
-                <input type="text" id="problem" name="problem">
-                <label for="questions">Imagine the data was a person blahblah etc what questions would you ask?</label><br>
-                <input type="text" id="questions" name="questions">
-                <label for="knowledge">What knowledge would you like to gain after your meeting?</label><br>
-                <input type="text" id="knowledge" name="knowledge">
-                <label for="actions">What sort of actions would you expect to take after the meeting, based on your discussion?</label><br>
-                <input type="text" id="actions" name="actions">
-                <input type="submit" value="please and thanks">
-              </form>"""
+@app.route('/', methods =["GET", "POST"])
+def projectinput():
+    if request.method == "POST":
+       # getting input with name = name in HTML form
+       orgname = request.form.get("orgname")
+       orgpurpose = request.form.get("orgpurpose") 
+       focusarea = request.form.get("focusarea") 
+       problem = request.form.get("problem") 
+       questions = request.form.get("questions") 
+       knowledge = request.form.get("knowledge") 
+       actions = request.form.get("actions") 
+       return "thanks "+ orgname + " lets have a look"
+    return render_template("input.html")
 
 """
 ### collect user input basic mode
